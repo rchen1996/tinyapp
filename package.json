@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/rchen1996/tinyapp#readme",
   "dependencies": {
+    "ejs": "^3.1.5",
     "express": "^4.17.1"
   }
 }
