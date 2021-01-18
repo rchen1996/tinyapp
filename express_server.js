@@ -1,8 +1,10 @@
 const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
+const bodyParser = require('body-parser');
 
 app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({extended: true}));
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouse.ca",
@@ -28,6 +30,11 @@ app.get('/urls', (req, res) => {
 
 app.get('/urls/new', (req, res) => {
   res.render('urls_new');
+});
+
+app.post('/urls', (req, res) => {
+  console.log(req.body); // logs the POST request body to console
+  res.send("Ok"); // respond with 'Ok'
 });
 
 app.get('/urls/:shortURL', (req, res) => {
