@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/rchen1996/tinyapp/issues"
   },
-  "homepage": "https://github.com/rchen1996/tinyapp#readme"
+  "homepage": "https://github.com/rchen1996/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
