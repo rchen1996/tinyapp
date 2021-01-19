@@ -22,6 +22,15 @@ const generateRandomString = function() {
   return Math.random().toString(36).substring(2, 8);
 };
 
+const emailLookup = function(usersDatabase, email) {
+  for (let user in usersDatabase) {
+    if (usersDatabase[user].email === email) {
+      return true;
+    }
+  }
+  return false;
+};
+
 // homepage (root)
 app.get('/', (req, res) => {
   res.send('Hello!');
@@ -111,16 +120,22 @@ app.get('/register', (req, res) => {
 
 // handles user registration
 app.post('/register', (req, res) => {
-  const newUserID = generateRandomString();
-  const newUser = {
-    id: newUserID,
-    email: req.body.email,
-    password: req.body.password
-  };
-  users[newUserID] = newUser;
-  res.cookie('user_id', newUserID);
-  console.log(users);
-  res.redirect('/urls');
+  const userExists = emailLookup(users, req.body.email);
+  console.log(userExists);
+  // checks if email/password are empty/email registered
+  if (!req.body.email || !req.body.password || userExists) {
+    res.send("400 - Bad Request");
+  } else {
+    const newUserID = generateRandomString();
+    const newUser = {
+      id: newUserID,
+      email: req.body.email,
+      password: req.body.password
+    };
+    users[newUserID] = newUser;
+    res.cookie('user_id', newUserID);
+    res.redirect('/urls');
+  }
 });
 
 app.listen(PORT, () => {
