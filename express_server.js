@@ -3,10 +3,12 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+app.use(morgan('dev'));
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -99,12 +101,26 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-// allows users to register
+// user registration page
 app.get('/register', (req, res) => {
   const templateVars = { 
     username: req.cookies.username
   };
   res.render('urls_register', templateVars);
+});
+
+// handles user registration
+app.post('/register', (req, res) => {
+  const newUserID = generateRandomString();
+  const newUser = {
+    id: newUserID,
+    email: req.body.email,
+    password: req.body.password
+  };
+  users[newUserID] = newUser;
+  res.cookie('user_id', newUserID);
+  console.log(users);
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
