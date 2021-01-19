@@ -112,9 +112,9 @@ app.post('/login', (req, res) => {
   if (!userExists || users[userExists].password !== req.body.password) {
     res.send("403 - Access Forbidden");
   } else {
-  // if both checks pass, set user_id cookie with user's random id
-  res.cookie('user_id', userExists);
-  res.redirect('/urls');
+    // if both checks pass, set user_id cookie with user's random id
+    res.cookie('user_id', userExists);
+    res.redirect('/urls');
   }
 });
 
