@@ -31,6 +31,16 @@ const emailLookup = function(usersDatabase, email) {
   return false;
 };
 
+const urlsForUser = function(id) {
+  const userURLs = {};
+  for (let url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      userURLs[url] = urlDatabase[url];
+    }
+  }
+  return userURLs;
+};
+
 // homepage (root)
 app.get('/', (req, res) => {
   res.send('Hello!');
@@ -48,8 +58,10 @@ app.get('/hello', (req, res) => {
 
 // shows the shortURL longURL pairs
 app.get('/urls', (req, res) => {
+  // filter urlDatabase comparing userID with user_id from cookie
+  const ownedURLs = urlsForUser(req.cookies['user_id']);
   const templateVars = { 
-    urls: urlDatabase,
+    urls: ownedURLs,
     user: users[req.cookies["user_id"]]
   };
   res.render('urls_index', templateVars);
@@ -57,7 +69,7 @@ app.get('/urls', (req, res) => {
 
 // for creating new shortURLs
 app.get('/urls/new', (req, res) => {
-  const isLoggedIn = req.cookies["user_id"];
+  const isLoggedIn = req.cookies['user_id'];
   if (isLoggedIn) {
     const templateVars = {
       user: users[req.cookies["user_id"]]
@@ -71,12 +83,19 @@ app.get('/urls/new', (req, res) => {
 // creates the shortURL and redirects to show user their newly created link
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: req.cookies['user_id']
+  };
   res.redirect(`/urls/${shortURL}`);
 });
 
 // shows user their shortURL
 app.get('/urls/:shortURL', (req, res) => {
+  // display mesage/prompt if user is not logged in
+  // display message/prompt if shortURL does not belong to them
+
+  // if logged in:
   const templateVars = { 
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
