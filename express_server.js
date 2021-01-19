@@ -11,8 +11,8 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b2xVn2: { longURL: "http://www.lighthouselabs.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "http://www.google.com", userID: "aJ48lW" }
 };
 
 const users = {};
