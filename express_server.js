@@ -25,7 +25,7 @@ const generateRandomString = function() {
 const emailLookup = function(usersDatabase, email) {
   for (let user in usersDatabase) {
     if (usersDatabase[user].email === email) {
-      return true;
+      return user;
     }
   }
   return false;
@@ -105,10 +105,17 @@ app.get('/login', (req, res) => {
   res.render('urls_login', templateVars);
 });
 
-// allows user to login with a username - redirects to /urls
+// allows user to login - redirects to /urls
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
+  const userExists = emailLookup(users, req.body.email);
+  // user with email not found or password doesn't match
+  if (!userExists || users[userExists].password !== req.body.password) {
+    res.send("403 - Access Forbidden");
+  } else {
+  // if both checks pass, set user_id cookie with user's random id
+  res.cookie('user_id', userExists);
   res.redirect('/urls');
+  }
 });
 
 // allows users to logout
@@ -128,7 +135,6 @@ app.get('/register', (req, res) => {
 // handles user registration
 app.post('/register', (req, res) => {
   const userExists = emailLookup(users, req.body.email);
-  console.log(userExists);
   // checks if email/password are empty/email registered
   if (!req.body.email || !req.body.password || userExists) {
     res.send("400 - Bad Request");
