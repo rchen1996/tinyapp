@@ -57,10 +57,15 @@ app.get('/urls', (req, res) => {
 
 // for creating new shortURLs
 app.get('/urls/new', (req, res) => {
-  const templateVars = {
-    user: users[req.cookies["user_id"]]
-  };
-  res.render('urls_new', templateVars);
+  const isLoggedIn = req.cookies["user_id"];
+  if (isLoggedIn) {
+    const templateVars = {
+      user: users[req.cookies["user_id"]]
+    };
+    res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/login');
+  }
 });
 
 // creates the shortURL and redirects to show user their newly created link
