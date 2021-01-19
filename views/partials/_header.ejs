@@ -11,9 +11,13 @@
       </div>
     </div>
     <% if (!user) { %>
-      <form class="form-inline" action="/login" method="POST">
-        <div class="form-group mb-2">
-          <input class="form-control" type="text" name="username" placeholder="username" style="width: 300px; margin: 1em">
+      <form class="form-inline" action="/register" method="GET">
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary" style="margin-right: 1em;">Register</button>
+        </div>
+      </form>
+      <form class="form-inline" action="/login" method="GET">
+        <div class="form-group">
           <button type="submit" class="btn btn-primary">Login</button>
         </div>
       </form>
