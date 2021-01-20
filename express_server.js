@@ -92,13 +92,10 @@ app.post('/urls', (req, res) => {
 
 // shows user their shortURL
 app.get('/urls/:shortURL', (req, res) => {
-  // display mesage/prompt if user is not logged in
-  // display message/prompt if shortURL does not belong to them
-
-  // if logged in:
   const templateVars = { 
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
+    urlUser: urlDatabase[req.params.shortURL].userID,
     user: users[req.cookies["user_id"]]
   };
   res.render('urls_show', templateVars);
