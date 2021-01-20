@@ -177,10 +177,15 @@ app.post('/logout', (req, res) => {
 
 // user registration page
 app.get('/register', (req, res) => {
-  const templateVars = { 
-    user: users[req.session.user_id]
-  };
-  res.render('urls_register', templateVars);
+  const isLoggedIn = req.session.user_id;
+  if (isLoggedIn) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = { 
+      user: users[isLoggedIn]
+    };
+    res.render('urls_register', templateVars);
+  }
 });
 
 // handles user registration
