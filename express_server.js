@@ -131,14 +131,14 @@ app.get('/login', (req, res) => {
 
 // allows user to login - redirects to /urls
 app.post('/login', (req, res) => {
-  const userExists = getUserByEmail(users, req.body.email);
-  const comparePasswords = bcrypt.compareSync(req.body.password, users[userExists].password);
+  const getUser = getUserByEmail(users, req.body.email);
+  const comparePasswords = bcrypt.compareSync(req.body.password, getUser.password);
   // user with email not found or password doesn't match
-  if (!userExists || !comparePasswords) {
+  if (!getUser || !comparePasswords) {
     res.send("403 - Access Forbidden");
   } else {
     // if both checks pass, set user_id cookie with user's random id
-    req.session.user_id = userExists;
+    req.session.user_id = getUser.id;
     res.redirect('/urls');
   }
 });
@@ -159,9 +159,9 @@ app.get('/register', (req, res) => {
 
 // handles user registration
 app.post('/register', (req, res) => {
-  const userExists = getUserByEmail(users, req.body.email);
+  const getUser = getUserByEmail(users, req.body.email);
   // checks if email/password are empty/email registered
-  if (!req.body.email || !req.body.password || userExists) {
+  if (!req.body.email || !req.body.password || getUser) {
     res.send("400 - Bad Request");
   } else {
     const newUserID = generateRandomString();
