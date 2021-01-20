@@ -2,13 +2,17 @@ const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const bcrypt = require('bcrypt');
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 app.use(morgan('dev'));
 
 const urlDatabase = {
@@ -60,20 +64,20 @@ app.get('/hello', (req, res) => {
 // shows the shortURL longURL pairs
 app.get('/urls', (req, res) => {
   // filter urlDatabase comparing userID with user_id from cookie
-  const ownedURLs = urlsForUser(req.cookies['user_id']);
+  const ownedURLs = urlsForUser(req.session.user_id);
   const templateVars = { 
     urls: ownedURLs,
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   };
   res.render('urls_index', templateVars);
 });
 
 // for creating new shortURLs
 app.get('/urls/new', (req, res) => {
-  const isLoggedIn = req.cookies['user_id'];
+  const isLoggedIn = req.session.user_id;
   if (isLoggedIn) {
     const templateVars = {
-      user: users[req.cookies["user_id"]]
+      user: users[isLoggedIn]
     };
     res.render('urls_new', templateVars);
   } else {
@@ -86,7 +90,7 @@ app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userID: req.cookies['user_id']
+    userID: req.session.user_id
   };
   res.redirect(`/urls/${shortURL}`);
 });
@@ -97,14 +101,14 @@ app.get('/urls/:shortURL', (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
     urlUser: urlDatabase[req.params.shortURL].userID,
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   };
   res.render('urls_show', templateVars);
 });
 
 // updates URL only if it is the user's own shortURL - longURL edited for specified shortURL
 app.post('/urls/:shortURL', (req, res) => {
-  const isLoggedIn = req.cookies['user_id'];
+  const isLoggedIn = req.session.user_id;
   if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
     res.redirect(`/urls/${req.params.shortURL}`);
@@ -119,7 +123,7 @@ app.get('/u/:shortURL', (req, res) => {
 
 // remove shortURL then redirect back to /urls
 app.post('/urls/:shortURL/delete', (req, res) => {
-  const isLoggedIn = req.cookies['user_id'];
+  const isLoggedIn = req.session.user_id;
   if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
@@ -128,7 +132,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 app.get('/login', (req, res) => {
   const templateVars = { 
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   };
   res.render('urls_login', templateVars);
 });
@@ -142,21 +146,21 @@ app.post('/login', (req, res) => {
     res.send("403 - Access Forbidden");
   } else {
     // if both checks pass, set user_id cookie with user's random id
-    res.cookie('user_id', userExists);
+    req.session.user_id = userExists;
     res.redirect('/urls');
   }
 });
 
 // allows users to logout
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/urls');
 });
 
 // user registration page
 app.get('/register', (req, res) => {
   const templateVars = { 
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   };
   res.render('urls_register', templateVars);
 });
@@ -176,7 +180,7 @@ app.post('/register', (req, res) => {
       password: bcryptPassword
     };
     users[newUserID] = newUser;
-    res.cookie('user_id', newUserID);
+    req.session.user_id = newUserID;
     res.redirect('/urls');
   }
 });
