@@ -84,12 +84,20 @@ app.get('/urls/new', (req, res) => {
 
 // creates the shortURL and redirects to show user their newly created link
 app.post('/urls', (req, res) => {
+  const isLoggedIn = req.session.user_id;
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = {
-    longURL: req.body.longURL,
-    userID: req.session.user_id
-  };
-  res.redirect(`/urls/${shortURL}`);
+  if (isLoggedIn) {
+    urlDatabase[shortURL] = {
+      longURL: req.body.longURL,
+      userID: isLoggedIn
+    };
+    res.redirect(`/urls/${shortURL}`);
+  } else {
+    const templateVars = {
+      user: users[isLoggedIn]
+    };
+    res.render('urls_new_error', templateVars);
+  }
 });
 
 // shows user their shortURL
