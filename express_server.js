@@ -112,7 +112,7 @@ app.get('/urls/:shortURL', (req, res) => {
     res.render('urls_show', templateVars);
   } else {
       templateVars.longURL = urlDatabase[req.params.shortURL].longURL;
-      templateVars.urlUser = urlDatabase[req.params.shortURL].userID,
+      templateVars.urlUser = urlDatabase[req.params.shortURL].userID;
     res.render('urls_show', templateVars);
   }
 });
@@ -122,7 +122,12 @@ app.post('/urls/:shortURL', (req, res) => {
   const isLoggedIn = req.session.user_id;
   if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-    res.redirect(`/urls`);
+    res.redirect('/urls');
+  } else {
+    templateVars = {
+      user: isLoggedIn,
+    }
+    res.render('urls_show_error', templateVars);
   }
 });
 
