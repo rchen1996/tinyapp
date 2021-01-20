@@ -12,7 +12,7 @@
       <div class="card text-center">
         <div class="card-header">
           <h5 class="card-title">Unable to Display URL</h5>
-          <p class="card-text">If you have already created an account, please login to view your TinyURL. If you do not have an account, please register an account first.</p>
+          <p class="card-text">If you have already created an account, please login to view your TinyURL. If you do not have an account, please create an account first.</p>
         </div>
       </div>
     <% } else if (user.id !== urlUser) { %>
@@ -35,7 +35,7 @@
             <form class="form-inline" action="/urls/<%= shortURL %>" method="POST" display="block-center">
               <label for="longURL">Update URL to:</label>
               <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 2em">
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary">Update</button>
           </form>
           </div>
         </div>
