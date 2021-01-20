@@ -94,13 +94,19 @@ app.post('/urls', (req, res) => {
 
 // shows user their shortURL
 app.get('/urls/:shortURL', (req, res) => {
-  const templateVars = { 
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    urlUser: urlDatabase[req.params.shortURL].userID,
+  const shortURL = req.params.shortURL;
+  const templateVars = {
+    urlDatabase,
+    shortURL,
     user: users[req.session.user_id]
   };
-  res.render('urls_show', templateVars);
+  if (!urlDatabase[shortURL]) {
+    res.render('urls_show', templateVars);
+  } else {
+      templateVars.longURL = urlDatabase[req.params.shortURL].longURL;
+      templateVars.urlUser = urlDatabase[req.params.shortURL].userID,
+    res.render('urls_show', templateVars);
+  }
 });
 
 // updates URL only if it is the user's own shortURL - longURL edited for specified shortURL
