@@ -118,8 +118,11 @@ app.get('/u/:shortURL', (req, res) => {
 
 // remove shortURL then redirect back to /urls
 app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
+  const isLoggedIn = req.cookies['user_id'];
+  if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect('/urls');
+  }
 });
 
 app.get('/login', (req, res) => {
