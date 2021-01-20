@@ -8,7 +8,14 @@
 
   <body>
     <%- include('partials/_header') %>
-    <% if (!user) { %>
+    <% if (!urlDatabase[shortURL]) { %>
+      <div class="card text-center">
+        <div class="card-header">
+          <h5 class="card-title">Unable to Display URL</h5>
+          <p class="card-text">The URL you are trying to access does not exist!</p>
+        </div>
+      </div>
+    <% } else if (!user) { %>
       <div class="card text-center">
         <div class="card-header">
           <h5 class="card-title">Unable to Display URL</h5>
