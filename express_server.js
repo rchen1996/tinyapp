@@ -27,9 +27,9 @@ const generateRandomString = function() {
   return Math.random().toString(36).substring(2, 8);
 };
 
-const emailLookup = function(usersDatabase, email) {
-  for (let user in usersDatabase) {
-    if (usersDatabase[user].email === email) {
+const getUserByEmail = function(database, email) {
+  for (let user in database) {
+    if (database[user].email === email) {
       return user;
     }
   }
@@ -139,7 +139,7 @@ app.get('/login', (req, res) => {
 
 // allows user to login - redirects to /urls
 app.post('/login', (req, res) => {
-  const userExists = emailLookup(users, req.body.email);
+  const userExists = getUserByEmail(users, req.body.email);
   const comparePasswords = bcrypt.compareSync(req.body.password, users[userExists].password);
   // user with email not found or password doesn't match
   if (!userExists || !comparePasswords) {
@@ -167,7 +167,7 @@ app.get('/register', (req, res) => {
 
 // handles user registration
 app.post('/register', (req, res) => {
-  const userExists = emailLookup(users, req.body.email);
+  const userExists = getUserByEmail(users, req.body.email);
   // checks if email/password are empty/email registered
   if (!req.body.email || !req.body.password || userExists) {
     res.send("400 - Bad Request");
