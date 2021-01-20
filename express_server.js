@@ -153,6 +153,11 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
+  } else {
+    templateVars = {
+      user: users[req.session.user_id]
+    };
+    res.render('urls_delete_error', templateVars);
   }
 });
 
