@@ -114,7 +114,7 @@ app.post('/urls/:shortURL', (req, res) => {
   const isLoggedIn = req.session.user_id;
   if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-    res.redirect(`/urls/${req.params.shortURL}`);
+    res.redirect(`/urls`);
   }
 });
 
@@ -144,10 +144,15 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-  const templateVars = { 
-    user: users[req.session.user_id]
-  };
-  res.render('urls_login', templateVars);
+  const isLoggedIn = req.session.user_id;
+  if (isLoggedIn) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = { 
+      user: users[isLoggedIn]
+    };
+    res.render('urls_login', templateVars);
+  }
 });
 
 // allows user to login - redirects to /urls
