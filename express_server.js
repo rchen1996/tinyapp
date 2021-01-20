@@ -120,8 +120,18 @@ app.post('/urls/:shortURL', (req, res) => {
 
 // uses shortURL to redirect to longURL
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
+  const shortURL = req.params.shortURL;
+  if (urlDatabase[shortURL]) {
+    const longURL = urlDatabase[shortURL].longURL;
+    res.redirect(longURL);
+  } else {
+    const templateVars = {
+      urlDatabase,
+      shortURL,
+      user: users[req.session.user_id]
+    };
+    res.render('urls_show', templateVars);
+  }
 });
 
 // remove shortURL then redirect back to /urls
