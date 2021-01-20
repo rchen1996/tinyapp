@@ -136,8 +136,9 @@ app.get('/login', (req, res) => {
 // allows user to login - redirects to /urls
 app.post('/login', (req, res) => {
   const userExists = emailLookup(users, req.body.email);
+  const comparePasswords = bcrypt.compareSync(req.body.password, users[userExists].password);
   // user with email not found or password doesn't match
-  if (!userExists || users[userExists].password !== req.body.password) {
+  if (!userExists || !comparePasswords) {
     res.send("403 - Access Forbidden");
   } else {
     // if both checks pass, set user_id cookie with user's random id
@@ -175,7 +176,6 @@ app.post('/register', (req, res) => {
       password: bcryptPassword
     };
     users[newUserID] = newUser;
-    console.log(users);
     res.cookie('user_id', newUserID);
     res.redirect('/urls');
   }
