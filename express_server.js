@@ -4,6 +4,7 @@ const PORT = 8080; // default port 8080
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const bcrypt = require('bcrypt');
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -167,12 +168,14 @@ app.post('/register', (req, res) => {
     res.send("400 - Bad Request");
   } else {
     const newUserID = generateRandomString();
+    const bcryptPassword = bcrypt.hashSync(req.body.password, 10);
     const newUser = {
       id: newUserID,
       email: req.body.email,
-      password: req.body.password
+      password: bcryptPassword
     };
     users[newUserID] = newUser;
+    console.log(users);
     res.cookie('user_id', newUserID);
     res.redirect('/urls');
   }
