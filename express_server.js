@@ -40,7 +40,12 @@ const urlsForUser = function(id) {
 
 // homepage (root)
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  const isLoggedIn = req.session.user_id;
+  if (isLoggedIn) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
+  }
 });
 
 // urlDatabase
