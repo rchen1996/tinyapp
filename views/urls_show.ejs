@@ -30,14 +30,14 @@
           <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
         </div>
         <div class="card-footer text-muted">
-          <h4 class="card-title">Edit URL</h4>
-          <form class="form-inline" action="/urls/<%= shortURL %>" method="POST">
-            <div class="form-group mb-2">
+          <h4 class="">Edit URL</h4>
+          <div class="mx-auto" style="width: fit-content">
+            <form class="form-inline" action="/urls/<%= shortURL %>" method="POST" display="block-center">
               <label for="longURL">Update URL to:</label>
               <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 2em">
               <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
           </form>
+          </div>
         </div>
       </div>
     <% } %>
