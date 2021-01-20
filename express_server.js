@@ -101,10 +101,13 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-// updates URL - longURL edited for specified shortURL
+// updates URL only if it is the user's own shortURL - longURL edited for specified shortURL
 app.post('/urls/:shortURL', (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
-  res.redirect(`/urls/${req.params.shortURL}`);
+  const isLoggedIn = req.cookies['user_id'];
+  if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
+    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+    res.redirect(`/urls/${req.params.shortURL}`);
+  }
 });
 
 // uses shortURL to redirect to longURL
