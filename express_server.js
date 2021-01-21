@@ -163,11 +163,13 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 app.get('/login', (req, res) => {
   const isLoggedIn = req.session.user_id;
+  const invalidParams = false;
   if (isLoggedIn) {
     res.redirect('/urls');
   } else {
     const templateVars = { 
-      user: users[isLoggedIn]
+      user: users[isLoggedIn],
+      error: invalidParams
     };
     res.render('urls_login', templateVars);
   }
@@ -176,14 +178,25 @@ app.get('/login', (req, res) => {
 // allows user to login - redirects to /urls
 app.post('/login', (req, res) => {
   const getUser = getUserByEmail(users, req.body.email);
-  const comparePasswords = bcrypt.compareSync(req.body.password, getUser.password);
-  // user with email not found or password doesn't match
-  if (!getUser || !comparePasswords) {
-    res.send("403 - Access Forbidden");
+  const invalidParams = true;
+  if (!getUser) {
+    const templateVars = { 
+      user: users[req.session.user_id],
+      error: invalidParams
+    };
+    res.render('urls_login', templateVars);
   } else {
-    // if both checks pass, set user_id cookie with user's random id
-    req.session.user_id = getUser.id;
-    res.redirect('/urls');
+    const samePasswords = bcrypt.compareSync(req.body.password, getUser.password);
+    if (samePasswords) {
+      req.session.user_id = getUser.id;
+      res.redirect('/urls');
+    } else {
+      const templateVars = { 
+        user: users[req.session.user_id],
+        error: invalidParams
+      };
+      res.render('urls_login', templateVars);
+    }
   }
 });
 
