@@ -36,12 +36,20 @@ app.get('/', (req, res) => {
 
 // shows the shortURL longURL pairs owned by user
 app.get('/urls', (req, res) => {
-  const ownedURLs = urlsForUser(urlDatabase, req.session.user_id);
-  const templateVars = {
-    urls: ownedURLs,
-    user: users[req.session.user_id],
-  };
-  res.render('urls_index', templateVars);
+  if (req.session.user_id) {
+    const ownedURLs = urlsForUser(urlDatabase, req.session.user_id);
+    const templateVars = {
+      urls: ownedURLs,
+      user: users[req.session.user_id],
+    };
+    res.render('urls_index', templateVars);
+  } else {
+    const templateVars = {
+      urls: null,
+      user: users[req.session.user_id],
+    };
+    res.render('urls_index', templateVars);
+  }
 });
 
 // for creating new shortURLs
@@ -60,8 +68,8 @@ app.get('/urls/new', (req, res) => {
 // creates shortURL
 app.post('/urls', (req, res) => {
   const userId = req.session.user_id;
-  const shortURL = generateRandomString();
   if (userId) {
+    const shortURL = generateRandomString();
     const currentDate = new Date();
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
