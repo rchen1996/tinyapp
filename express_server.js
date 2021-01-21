@@ -68,7 +68,8 @@ app.post('/urls', (req, res) => {
       userID: isLoggedIn,
       dateCreated: currentDate.toLocaleDateString(),
       totalVisits: 0,
-      uniqueVisits: 0
+      uniqueVisits: 0,
+      visitorLog: []
     };
     res.redirect(`/urls/${shortURL}`);
   } else {
@@ -115,12 +116,19 @@ app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   if (urlDatabase[shortURL]) {
     const longURL = urlDatabase[shortURL].longURL;
+    // analytics: total/unique visits, timestamp
     urlDatabase[shortURL].totalVisits += 1;
     const visitorId = generateRandomString();
     if (!req.session['visitor_id']) {
       req.session['visitor_id'] = visitorId;
       urlDatabase[shortURL].uniqueVisits += 1;
     }
+    const currentDate = new Date();
+    const visitLog = {
+      timestamp: currentDate.toLocaleString('en-US', { timeZone: 'America/New_York' }),
+      visitorId
+    };
+    urlDatabase[shortURL].visitorLog.push(visitLog);
     res.redirect(longURL);
   } else {
     const templateVars = {

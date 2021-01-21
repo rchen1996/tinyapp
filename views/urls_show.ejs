@@ -49,6 +49,25 @@
             </form>
           </div>
         </div>
+        <div class="card-body">
+          <h5 class="card-title">TinyURL Visitor Log</h5>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Timestamp</th>
+                <th scope="col">Visitor ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <% for (let visit of urlDatabase[shortURL].visitorLog) { %>
+                  <td><%= visit.timestamp %></td>
+                  <td><%= visit.visitorId %></td>
+                <% } %>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     <% } %>
     <!-- Bootstrap JS -->
