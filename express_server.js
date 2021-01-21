@@ -26,8 +26,8 @@ const urlDatabase = {
 const users = {};
 
 app.get('/', (req, res) => {
-  const isLoggedIn = req.session.user_id;
-  if (isLoggedIn) {
+  const userId = req.session.user_id;
+  if (userId) {
     res.redirect('/urls');
   } else {
     res.redirect('/login');
@@ -46,10 +46,10 @@ app.get('/urls', (req, res) => {
 
 // for creating new shortURLs
 app.get('/urls/new', (req, res) => {
-  const isLoggedIn = req.session.user_id;
-  if (isLoggedIn) {
+  const userId = req.session.user_id;
+  if (userId) {
     const templateVars = {
-      user: users[isLoggedIn]
+      user: users[userId]
     };
     res.render('urls_new', templateVars);
   } else {
@@ -59,13 +59,13 @@ app.get('/urls/new', (req, res) => {
 
 // creates shortURL
 app.post('/urls', (req, res) => {
-  const isLoggedIn = req.session.user_id;
+  const userId = req.session.user_id;
   const shortURL = generateRandomString();
-  if (isLoggedIn) {
+  if (userId) {
     const currentDate = new Date();
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
-      userID: isLoggedIn,
+      userID: userId,
       dateCreated: currentDate.toLocaleDateString(),
       totalVisits: 0,
       uniqueVisits: 0,
@@ -74,7 +74,7 @@ app.post('/urls', (req, res) => {
     res.redirect(`/urls/${shortURL}`);
   } else {
     const templateVars = {
-      user: users[isLoggedIn]
+      user: users[userId]
     };
     res.render('urls_new_error', templateVars);
   }
@@ -99,13 +99,13 @@ app.get('/urls/:shortURL', (req, res) => {
 
 // edits URL only if it is the user's own shortURL
 app.put('/urls/:shortURL', (req, res) => {
-  const isLoggedIn = req.session.user_id;
-  if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
+  const userId = req.session.user_id;
+  if (userId === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
     res.redirect('/urls');
   } else {
     const templateVars = {
-      user: isLoggedIn,
+      user: userId,
     };
     res.render('urls_show_error', templateVars);
   }
@@ -142,8 +142,8 @@ app.get('/u/:shortURL', (req, res) => {
 
 // remove shortURL only if owned
 app.delete('/urls/:shortURL/delete', (req, res) => {
-  const isLoggedIn = req.session.user_id;
-  if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
+  const userId = req.session.user_id;
+  if (userId === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
   } else {
@@ -155,13 +155,13 @@ app.delete('/urls/:shortURL/delete', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-  const isLoggedIn = req.session.user_id;
+  const userId = req.session.user_id;
   const invalidParams = false;
-  if (isLoggedIn) {
+  if (userId) {
     res.redirect('/urls');
   } else {
     const templateVars = {
-      user: users[isLoggedIn],
+      user: users[userId],
       error: invalidParams
     };
     res.render('urls_login', templateVars);
@@ -169,19 +169,19 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const getUser = getUserByEmail(users, req.body.email);
+  const user = getUserByEmail(users, req.body.email);
   const invalidParams = true;
   // if user exists & passwords match login, else display error
-  if (!getUser) {
+  if (!user) {
     const templateVars = {
       user: users[req.session.user_id],
       error: invalidParams
     };
     res.render('urls_login', templateVars);
   } else {
-    const samePasswords = bcrypt.compareSync(req.body.password, getUser.password);
+    const samePasswords = bcrypt.compareSync(req.body.password, user.password);
     if (samePasswords) {
-      req.session.user_id = getUser.id;
+      req.session.user_id = user.id;
       res.redirect('/urls');
     } else {
       const templateVars = {
@@ -199,34 +199,34 @@ app.post('/logout', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  const isLoggedIn = req.session.user_id;
-  if (isLoggedIn) {
+  const userId = req.session.user_id;
+  if (userId) {
     res.redirect('/urls');
   } else {
     const templateVars = {
-      user: users[isLoggedIn],
+      user: users[userId],
       invalidParams: false,
-      getUser: false
+      userId: false
     };
     res.render('urls_register', templateVars);
   }
 });
 
 app.post('/register', (req, res) => {
-  const getUser = getUserByEmail(users, req.body.email);
+  const userId = getUserByEmail(users, req.body.email);
   // checks if email/password are empty/email registered - displays error, otherwise create acc
   if (!req.body.email || !req.body.password) {
     const templateVars = {
       user: users[req.session.user_id],
       invalidParams: true,
-      getUser
+      userId
     };
     res.render('urls_register', templateVars);
-  } else if (getUser) {
+  } else if (userId) {
     const templateVars = {
       user: users[req.session.user_id],
       invalidParams: false,
-      getUser
+      userId
     };
     res.render('urls_register', templateVars);
   } else {

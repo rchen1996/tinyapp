@@ -11,7 +11,7 @@
     <main style="margin: 1em; width: fit-content;" class="mx-auto">
       <% if (invalidParams) { %>
         <div class="alert alert-danger text-center" role="alert">Email and Password fields cannot be left blank.</div>
-      <% } else if (getUser) { %>
+      <% } else if (userId) { %>
         <div class="alert alert-danger text-center" role="alert">This email has already been registered.</div>
       <% } %>
       <h3>Create An Account</h3>
