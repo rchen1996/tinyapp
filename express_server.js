@@ -119,14 +119,14 @@ app.get('/u/:shortURL', (req, res) => {
     // analytics: total/unique visits, timestamp
     urlDatabase[shortURL].totalVisits += 1;
     const visitorId = generateRandomString();
-    if (!req.session['visitor_id']) {
-      req.session['visitor_id'] = visitorId;
+    if (!req.session[`visitor_id_${shortURL}`]) {
+      req.session[`visitor_id_${shortURL}`] = visitorId;
       urlDatabase[shortURL].uniqueVisits += 1;
     }
     const currentDate = new Date();
     const visitLog = {
       timestamp: currentDate.toLocaleString('en-US', { timeZone: 'America/New_York' }),
-      visitorId
+      visitorId: req.session[`visitor_id_${shortURL}`]
     };
     urlDatabase[shortURL].visitorLog.push(visitLog);
     res.redirect(longURL);
@@ -244,5 +244,5 @@ app.post('/register', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
