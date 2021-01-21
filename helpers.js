@@ -11,11 +11,11 @@ const generateRandomString = function() {
   return Math.random().toString(36).substring(2, 8);
 };
 
-const urlsForUser = function(id) {
+const urlsForUser = function(database, id) {
   const userURLs = {};
-  for (let url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      userURLs[url] = urlDatabase[url];
+  for (let url in database) {
+    if (database[url].userID === id) {
+      userURLs[url] = database[url];
     }
   }
   return userURLs;
