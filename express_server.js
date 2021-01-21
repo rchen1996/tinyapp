@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const bcrypt = require('bcrypt');
-const { getUserByEmail } = require('./helpers');
+const { getUserByEmail, generateRandomString, urlsForUser  } = require('./helpers');
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -22,21 +22,6 @@ const urlDatabase = {
 };
 
 const users = {};
-
-// simulate generating unique shortURL - 6 random alphanumeric characters
-const generateRandomString = function() {
-  return Math.random().toString(36).substring(2, 8);
-};
-
-const urlsForUser = function(id) {
-  const userURLs = {};
-  for (let url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      userURLs[url] = urlDatabase[url];
-    }
-  }
-  return userURLs;
-};
 
 // homepage (root)
 app.get('/', (req, res) => {
