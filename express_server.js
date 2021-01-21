@@ -213,7 +213,9 @@ app.get('/register', (req, res) => {
     res.redirect('/urls');
   } else {
     const templateVars = { 
-      user: users[isLoggedIn]
+      user: users[isLoggedIn],
+      invalidParams: false,
+      getUser: false
     };
     res.render('urls_register', templateVars);
   }
@@ -223,8 +225,20 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   const getUser = getUserByEmail(users, req.body.email);
   // checks if email/password are empty/email registered
-  if (!req.body.email || !req.body.password || getUser) {
-    res.send("400 - Bad Request");
+  if (!req.body.email || !req.body.password) {
+    const templateVars = { 
+      user: users[req.session.user_id],
+      invalidParams: true,
+      getUser
+    };
+    res.render('urls_register', templateVars);
+  } else if (getUser) {
+    const templateVars = { 
+      user: users[req.session.user_id],
+      invalidParams: false,
+      getUser
+    };
+    res.render('urls_register', templateVars);
   } else {
     const newUserID = generateRandomString();
     const bcryptPassword = bcrypt.hashSync(req.body.password, 10);
