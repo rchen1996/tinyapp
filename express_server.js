@@ -39,7 +39,7 @@ app.get('/urls', (req, res) => {
   const ownedURLs = urlsForUser(urlDatabase, req.session.user_id);
   const templateVars = {
     urls: ownedURLs,
-    user: users[req.session.user_id]
+    user: users[req.session.user_id],
   };
   res.render('urls_index', templateVars);
 });
@@ -62,9 +62,11 @@ app.post('/urls', (req, res) => {
   const isLoggedIn = req.session.user_id;
   const shortURL = generateRandomString();
   if (isLoggedIn) {
+    const currentDate = new Date();
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
-      userID: isLoggedIn
+      userID: isLoggedIn,
+      dateCreated: currentDate.toLocaleDateString()
     };
     res.redirect(`/urls/${shortURL}`);
   } else {

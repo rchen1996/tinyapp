@@ -35,6 +35,7 @@
         <div class="card-body">
           <h5 class="card-title">TinyURL for: <%= longURL %></h5>
           <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+          <p class="card-text">Date Created: <%= urlDatabase[shortURL].dateCreated %></p>
         </div>
         <div class="card-footer text-muted">
           <h4 class="">Edit URL</h4>
