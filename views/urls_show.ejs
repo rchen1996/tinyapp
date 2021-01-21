@@ -59,12 +59,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <% for (let visit of urlDatabase[shortURL].visitorLog) { %>
+              <% for (let visit of urlDatabase[shortURL].visitorLog) { %>
+                <tr>
                   <td><%= visit.timestamp %></td>
                   <td><%= visit.visitorId %></td>
-                <% } %>
-              </tr>
+                </tr>
+              <% } %>
             </tbody>
           </table>
         </div>
