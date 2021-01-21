@@ -93,7 +93,7 @@ app.get('/urls/:shortURL', (req, res) => {
 });
 
 // edits URL only if it is the user's own shortURL
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
   const isLoggedIn = req.session.user_id;
   if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
@@ -123,7 +123,7 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 // remove shortURL only if owned
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL/delete', (req, res) => {
   const isLoggedIn = req.session.user_id;
   if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];

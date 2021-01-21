@@ -39,7 +39,7 @@
         <div class="card-footer text-muted">
           <h4 class="">Edit URL</h4>
           <div class="mx-auto" style="width: fit-content">
-            <form class="form-inline" action="/urls/<%= shortURL %>" method="POST" display="block-center">
+            <form class="form-inline" action="/urls/<%= shortURL %>?_method=PUT" method="POST" display="block-center">
               <label for="longURL">Update URL to:</label>
               <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 2em">
               <button type="submit" class="btn btn-primary">Update</button>
