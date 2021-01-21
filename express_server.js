@@ -23,7 +23,6 @@ const urlDatabase = {
 
 const users = {};
 
-// homepage (root)
 app.get('/', (req, res) => {
   const isLoggedIn = req.session.user_id;
   if (isLoggedIn) {
@@ -33,21 +32,10 @@ app.get('/', (req, res) => {
   }
 });
 
-// urlDatabase
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
-});
-
-// demonstrates can use HTML to display message
-app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b>World</b></body></html>\n');
-});
-
-// shows the shortURL longURL pairs
+// shows the shortURL longURL pairs owned by user
 app.get('/urls', (req, res) => {
-  // filter urlDatabase comparing userID with user_id from cookie
-  const ownedURLs = urlsForUser(req.session.user_id);
-  const templateVars = { 
+  const ownedURLs = urlsForUser(urlDatabase, req.session.user_id);
+  const templateVars = {
     urls: ownedURLs,
     user: users[req.session.user_id]
   };
@@ -67,7 +55,7 @@ app.get('/urls/new', (req, res) => {
   }
 });
 
-// creates the shortURL and redirects to show user their newly created link
+// creates shortURL
 app.post('/urls', (req, res) => {
   const isLoggedIn = req.session.user_id;
   const shortURL = generateRandomString();
@@ -96,22 +84,22 @@ app.get('/urls/:shortURL', (req, res) => {
   if (!urlDatabase[shortURL]) {
     res.render('urls_show', templateVars);
   } else {
-      templateVars.longURL = urlDatabase[req.params.shortURL].longURL;
-      templateVars.urlUser = urlDatabase[req.params.shortURL].userID;
+    templateVars.longURL = urlDatabase[req.params.shortURL].longURL;
+    templateVars.urlUser = urlDatabase[req.params.shortURL].userID;
     res.render('urls_show', templateVars);
   }
 });
 
-// updates URL only if it is the user's own shortURL - longURL edited for specified shortURL
+// edits URL only if it is the user's own shortURL
 app.post('/urls/:shortURL', (req, res) => {
   const isLoggedIn = req.session.user_id;
   if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
     res.redirect('/urls');
   } else {
-    templateVars = {
+    const templateVars = {
       user: isLoggedIn,
-    }
+    };
     res.render('urls_show_error', templateVars);
   }
 });
@@ -132,14 +120,14 @@ app.get('/u/:shortURL', (req, res) => {
   }
 });
 
-// remove shortURL then redirect back to /urls
+// remove shortURL only if owned
 app.post('/urls/:shortURL/delete', (req, res) => {
   const isLoggedIn = req.session.user_id;
   if (isLoggedIn === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
   } else {
-    templateVars = {
+    const templateVars = {
       user: users[req.session.user_id]
     };
     res.render('urls_delete_error', templateVars);
@@ -152,7 +140,7 @@ app.get('/login', (req, res) => {
   if (isLoggedIn) {
     res.redirect('/urls');
   } else {
-    const templateVars = { 
+    const templateVars = {
       user: users[isLoggedIn],
       error: invalidParams
     };
@@ -160,12 +148,12 @@ app.get('/login', (req, res) => {
   }
 });
 
-// allows user to login - redirects to /urls
 app.post('/login', (req, res) => {
   const getUser = getUserByEmail(users, req.body.email);
   const invalidParams = true;
+  // if user exists & passwords match login, else display error
   if (!getUser) {
-    const templateVars = { 
+    const templateVars = {
       user: users[req.session.user_id],
       error: invalidParams
     };
@@ -176,7 +164,7 @@ app.post('/login', (req, res) => {
       req.session.user_id = getUser.id;
       res.redirect('/urls');
     } else {
-      const templateVars = { 
+      const templateVars = {
         user: users[req.session.user_id],
         error: invalidParams
       };
@@ -185,19 +173,17 @@ app.post('/login', (req, res) => {
   }
 });
 
-// allows users to logout
 app.post('/logout', (req, res) => {
   req.session = null;
   res.redirect('/urls');
 });
 
-// user registration page
 app.get('/register', (req, res) => {
   const isLoggedIn = req.session.user_id;
   if (isLoggedIn) {
     res.redirect('/urls');
   } else {
-    const templateVars = { 
+    const templateVars = {
       user: users[isLoggedIn],
       invalidParams: false,
       getUser: false
@@ -206,19 +192,18 @@ app.get('/register', (req, res) => {
   }
 });
 
-// handles user registration
 app.post('/register', (req, res) => {
   const getUser = getUserByEmail(users, req.body.email);
-  // checks if email/password are empty/email registered
+  // checks if email/password are empty/email registered - displays error, otherwise create acc
   if (!req.body.email || !req.body.password) {
-    const templateVars = { 
+    const templateVars = {
       user: users[req.session.user_id],
       invalidParams: true,
       getUser
     };
     res.render('urls_register', templateVars);
   } else if (getUser) {
-    const templateVars = { 
+    const templateVars = {
       user: users[req.session.user_id],
       invalidParams: false,
       getUser
