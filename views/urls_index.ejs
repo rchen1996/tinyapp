@@ -40,7 +40,7 @@
                 <td><%= urls[url].longURL %></td>
                 <td><%= urls[url].dateCreated %></td>
                 <td><%= urls[url].totalVisits %></td>
-                <td></td>
+                <td><%= urls[url].uniqueVisits %></td>
                 <td>
                   <form method="GET" action="/urls/<%= url %>">
                     <button type="submit" class="btn btn-primary">Edit</button>

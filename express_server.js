@@ -40,7 +40,6 @@ app.get('/urls', (req, res) => {
   const templateVars = {
     urls: ownedURLs,
     user: users[req.session.user_id],
-    totalVisits: req.session['total_visits']
   };
   res.render('urls_index', templateVars);
 });
@@ -68,7 +67,8 @@ app.post('/urls', (req, res) => {
       longURL: req.body.longURL,
       userID: isLoggedIn,
       dateCreated: currentDate.toLocaleDateString(),
-      totalVisits: 0
+      totalVisits: 0,
+      uniqueVisits: 0
     };
     res.redirect(`/urls/${shortURL}`);
   } else {
@@ -116,6 +116,11 @@ app.get('/u/:shortURL', (req, res) => {
   if (urlDatabase[shortURL]) {
     const longURL = urlDatabase[shortURL].longURL;
     urlDatabase[shortURL].totalVisits += 1;
+    const visitorId = generateRandomString();
+    if (!req.session['visitor_id']) {
+      req.session['visitor_id'] = visitorId;
+      urlDatabase[shortURL].uniqueVisits += 1;
+    }
     res.redirect(longURL);
   } else {
     const templateVars = {
